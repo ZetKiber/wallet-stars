@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Маркет | WalletStars</title>
+    <link rel="stylesheet" href="../styles/globals.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="../scripts/main.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Верхний блок с названием и кнопками -->
+        <header class="app-header">
+            <div class="header-actions">
+                <a href="index.html" class="icon-button">
+                    <span class="material-icons">arrow_back</span>
+                </a>
+                <div class="header-title">Маркет WalletStars</div>
+                <div class="header-right-buttons">
+                    <button class="icon-button">
+                        <span class="material-icons">more_vert</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Главный блок страницы -->
+        <div class="market-content">
+            <h1 class="market-title">Маркет WalletStars</h1>
+            <p class="market-description">
+                Покупай и продавай звёзды. Дари Premium своим друзьям и не только.
+            </p>
+
+            <!-- Блоки покупки и продажи -->
+            <div class="market-actions">
+                <div class="market-action-card">
+                    <div class="market-action-icon">
+                        <span class="material-icons">shopping_cart</span>
+                    </div>
+                    <div class="market-action-title">Купить звёзды</div>
+                    <a href="buy.html" class="market-action-button">Купить</a>
+                </div>
+                
+                <div class="market-action-card">
+                    <div class="market-action-icon">
+                        <span class="material-icons">sell</span>
+                    </div>
+                    <div class="market-action-title">Продать звёзды</div>
+                    <a href="sell.html" class="market-action-button">Продать</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижнее меню -->
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <span class="material-icons">account_balance_wallet</span>
+                <span class="nav-label">Кошелёк</span>
+            </a>
+            <a href="market.html" class="nav-item active">
+                <span class="material-icons">storefront</span>
+                <span class="nav-label">Маркет</span>
+            </a>
+            <a href="checks.html" class="nav-item">
+                <span class="material-icons">receipt</span>
+                <span class="nav-label">Чеки</span>
+            </a>
+            <a href="partnership.html" class="nav-item">
+                <span class="material-icons">people</span>
+                <span class="nav-label">Партнёрство</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons">card_giftcard</span>
+                <span class="nav-label">Розыгрыш</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Уведомление о копировании -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию
+            const userData = checkAuth();
+            if (!userData) return;
+            
+            // Загружаем изображения для карточек (заглушка)
+            // В реальном проекте здесь может быть логика загрузки изображений
+            // или другие функции инициализации
+        });
+    </script>
+
+    <style>
+        /* Стили для страницы маркета */
+        .market-content {
+            padding: var(--spacing-md);
+            text-align: center;
+        }
+        
+        .market-title {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .market-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: var(--spacing-xl);
+            line-height: 1.6;
+        }
+        
+        .market-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+        }
+        
+        .market-action-card {
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .market-action-icon {
+            font-size: 48px;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .market-action-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .market-action-button {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background-color: var(--blue-primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+        }
+    </style>
+</body>
+</html> 

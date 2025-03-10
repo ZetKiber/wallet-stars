@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>История транзакций | WalletStars</title>
+    <link rel="stylesheet" href="../styles/globals.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="../scripts/main.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Верхний блок с названием и кнопками -->
+        <header class="app-header">
+            <div class="header-actions">
+                <a href="index.html" class="icon-button">
+                    <span class="material-icons">arrow_back</span>
+                </a>
+                <div class="header-title">История транзакций</div>
+                <div class="header-right-buttons">
+                    <button class="icon-button">
+                        <span class="material-icons">more_vert</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Главный блок страницы -->
+        <div class="transactions-content">
+            <h1 class="transactions-title">История транзакций</h1>
+            
+            <!-- Фильтры транзакций -->
+            <div class="transaction-filters">
+                <div class="filter-button active" data-filter="all">Все</div>
+                <div class="filter-button" data-filter="deposit">Пополнения</div>
+                <div class="filter-button" data-filter="withdraw">Выводы</div>
+            </div>
+            
+            <!-- Список транзакций -->
+            <div class="transactions-list" id="transactions-list">
+                <!-- Транзакции будут добавлены через JavaScript -->
+                <div class="empty-transactions-message">
+                    <span class="material-icons">receipt_long</span>
+                    <p>История транзакций пуста</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижнее меню -->
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <span class="material-icons">account_balance_wallet</span>
+                <span class="nav-label">Кошелёк</span>
+            </a>
+            <a href="market.html" class="nav-item">
+                <span class="material-icons">storefront</span>
+                <span class="nav-label">Маркет</span>
+            </a>
+            <a href="checks.html" class="nav-item">
+                <span class="material-icons">receipt</span>
+                <span class="nav-label">Чеки</span>
+            </a>
+            <a href="partnership.html" class="nav-item">
+                <span class="material-icons">people</span>
+                <span class="nav-label">Партнёрство</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons">card_giftcard</span>
+                <span class="nav-label">Розыгрыш</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Уведомление о копировании -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию
+            const userData = checkAuth();
+            if (!userData) return;
+            
+            // Элементы интерфейса
+            const transactionsList = document.getElementById('transactions-list');
+            const filterButtons = document.querySelectorAll('.filter-button');
+            
+            // Инициализация страницы
+            renderTransactions(userData.transactions);
+            
+            // Обработчики для кнопок фильтра
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Удаляем класс active у всех кнопок
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Добавляем класс active текущей кнопке
+                    this.classList.add('active');
+                    
+                    // Фильтруем и отображаем транзакции
+                    const filter = this.getAttribute('data-filter');
+                    filterTransactions(filter, userData.transactions);
+                });
+            });
+            
+            // Функция для фильтрации транзакций
+            function filterTransactions(filter, transactions) {
+                let filteredTransactions;
+                
+                if (filter === 'all') {
+                    filteredTransactions = transactions;
+                } else {
+                    filteredTransactions = transactions.filter(tx => tx.type === filter);
+                }
+                
+                renderTransactions(filteredTransactions);
+            }
+            
+            // Функция для отображения транзакций
+            function renderTransactions(transactions) {
+                transactionsList.innerHTML = '';
+                
+                if (transactions.length === 0) {
+                    transactionsList.innerHTML = `
+                        <div class="empty-transactions-message">
+                            <span class="material-icons">receipt_long</span>
+                            <p>История транзакций пуста</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Сортируем транзакции по дате (сначала новые)
+                const sortedTransactions = [...transactions].sort((a, b) => 
+                    new Date(b.date) - new Date(a.date)
+                );
+                
+                // Отображаем каждую транзакцию
+                sortedTransactions.forEach(tx => {
+                    const transactionItem = document.createElement('div');
+                    transactionItem.className = `transaction-item ${tx.type}`;
+                    
+                    // Определяем иконку и класс для транзакции
+                    let icon, typeLabel, typeClass;
+                    
+                    if (tx.type === 'deposit') {
+                        icon = 'arrow_downward';
+                        typeLabel = 'Пополнение';
+                        typeClass = 'deposit';
+                    } else {
+                        icon = 'arrow_upward';
+                        typeLabel = 'Вывод';
+                        typeClass = 'withdraw';
+                    }
+                    
+                    // Формат суммы и даты
+                    const amount = formatNumber(tx.amount, 
+                        tx.currency === 'STARS' ? 0 : 6
+                    );
+                    const date = formatDate(tx.date);
+                    
+                    // Создаем разметку для транзакции
+                    transactionItem.innerHTML = `
+                        <div class="transaction-icon ${typeClass}">
+                            <span class="material-icons">${icon}</span>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-type">${typeLabel}</div>
+                            <div class="transaction-date">${date}</div>
+                        </div>
+                        <div class="transaction-amount ${typeClass}">
+                            ${tx.type === 'deposit' ? '+' : '-'} ${amount} ${tx.currency}
+                        </div>
+                    `;
+                    
+                    transactionsList.appendChild(transactionItem);
+                });
+            }
+        });
+    </script>
+
+    <style>
+        /* Стили для страницы истории транзакций */
+        .transactions-content {
+            padding: var(--spacing-md);
+        }
+        
+        .transactions-title {
+            font-size: 24px;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .transaction-filters {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            overflow-x: auto;
+            padding-bottom: var(--spacing-sm);
+        }
+        
+        .filter-button {
+            padding: var(--spacing-sm) var(--spacing-md);
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius-sm);
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .filter-button.active {
+            background-color: var(--blue-primary);
+            color: white;
+        }
+        
+        .transactions-list {
+            margin-top: var(--spacing-md);
+        }
+        
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md);
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: var(--spacing-md);
+            flex-shrink: 0;
+        }
+        
+        .transaction-icon.deposit {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+        
+        .transaction-icon.withdraw {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--error-color);
+        }
+        
+        .transaction-details {
+            flex-grow: 1;
+        }
+        
+        .transaction-type {
+            font-weight: 500;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+        
+        .transaction-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .transaction-amount {
+            font-weight: 500;
+            font-size: 16px;
+            text-align: right;
+        }
+        
+        .transaction-amount.deposit {
+            color: var(--success-color);
+        }
+        
+        .transaction-amount.withdraw {
+            color: var(--error-color);
+        }
+        
+        .empty-transactions-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: var(--spacing-xl) 0;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+        
+        .empty-transactions-message .material-icons {
+            font-size: 48px;
+            margin-bottom: var(--spacing-md);
+        }
+    </style>
+</body>
+</html> 

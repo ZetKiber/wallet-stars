@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Авторизация | WalletStars</title>
+    <link rel="stylesheet" href="/styles/globals.css">
+    <link rel="stylesheet" href="/styles/components.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="/scripts/main.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="/assets/images/logo.svg" alt="WalletStars Logo" class="login-logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%230088CC\'/><path d=\'M50,25 L60,40 L75,45 L65,60 L65,75 L50,65 L35,75 L35,60 L25,45 L40,40 Z\' fill=\'white\'/></svg>'">
+                <h1 class="login-title">WalletStars</h1>
+                <p class="login-subtitle">Безопасный криптокошелек в Telegram</p>
+            </div>
+            
+            <div class="login-content">
+                <div class="login-description">
+                    <p>Войдите с помощью Telegram, чтобы получить доступ к вашему кошельку</p>
+                </div>
+                
+                <div class="telegram-login-widget">
+                    <script async src="https://telegram.org/js/telegram-widget.js?22" 
+                            data-telegram-login="artemWeb_bot" 
+                            data-size="large" 
+                            data-auth-url="http://localhost:3000/api/auth/telegram/callback"
+                            data-radius="8"
+                            data-request-access="write"
+                            data-userpic="true"
+                            data-onauth="onTelegramAuth(user)"></script>
+                </div>
+                
+                <!-- Демо-режим для тестирования без бота -->
+                <div class="demo-login">
+                    <button id="demo-login-btn" class="demo-login-btn">Демо-режим (для тестирования)</button>
+                </div>
+                
+                <!-- Отладочная информация -->
+                <div class="debug-info" style="margin-top: 20px; font-size: 12px; color: #666;">
+                    <p>Если кнопка Telegram не отображается:</p>
+                    <ol style="text-align: left; margin-top: 5px;">
+                        <li>Проверьте, что бот @name2929e_bot активен</li>
+                        <li>Проверьте настройки /setdomain у @BotFather</li>
+                        <li>Проверьте консоль на ошибки</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="login-features">
+                <div class="feature-item">
+                    <span class="material-icons">security</span>
+                    <span>Безопасность</span>
+                </div>
+                <div class="feature-item">
+                    <span class="material-icons">account_balance_wallet</span>
+                    <span>Мультивалютность</span>
+                </div>
+                <div class="feature-item">
+                    <span class="material-icons">speed</span>
+                    <span>Быстрые транзакции</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Уведомление о копировании -->
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        // Функция для отладки
+        function debugLog(title, data) {
+            console.log('===== ' + title + ' =====');
+            console.log(data);
+            console.log('===================');
+        }
+        
+        // Функция, которая будет вызвана после успешной авторизации через Telegram
+        function onTelegramAuth(user) {
+            debugLog('Данные пользователя от Telegram', user);
+            showToast('Получены данные от Telegram. Авторизация...');
+            
+            // Отправляем данные на наш сервер
+            fetch('http://localhost:3000/api/auth/telegram/callback', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(user)
+            })
+            .then(response => {
+                debugLog('HTTP статус ответа', response.status);
+                if (!response.ok) {
+                    throw new Error('Ошибка сервера: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                debugLog('Данные от сервера', data);
+                if (data.token) {
+                    // Сохраняем токен и данные пользователя
+                    localStorage.setItem('wallet_stars_token', data.token);
+                    localStorage.setItem('wallet_stars_user', JSON.stringify(data.user));
+                    
+                    // Показываем сообщение об успешной авторизации
+                    showToast('Авторизация успешна!');
+                    
+                    // Перенаправляем на главную страницу
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showToast('Ошибка авторизации: ' + (data.message || 'Неизвестная ошибка'));
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при авторизации:', error);
+                showToast('Ошибка соединения с сервером: ' + error.message);
+            });
+        }
+        
+        // Демо-режим для тестирования без бота
+        document.getElementById('demo-login-btn').addEventListener('click', function() {
+            // Показываем сообщение о загрузке
+            showToast('Подключение к демо-режиму...');
+            
+            // Отправляем запрос на демо-авторизацию
+            fetch('http://localhost:3000/api/auth/demo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                debugLog('HTTP статус ответа демо-авторизации', response.status);
+                if (!response.ok) {
+                    throw new Error('Ошибка сервера: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                debugLog('Данные от демо-авторизации', data);
+                if (data.token) {
+                    // Сохраняем токен и данные пользователя
+                    localStorage.setItem('wallet_stars_token', data.token);
+                    localStorage.setItem('wallet_stars_user', JSON.stringify(data.user));
+                    
+                    // Показываем сообщение об успешной авторизации
+                    showToast('Демо-режим активирован!');
+                    
+                    // Перенаправляем на главную страницу
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+                } else {
+                    showToast('Ошибка авторизации: ' + (data.message || 'Неизвестная ошибка'));
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при демо-авторизации:', error);
+                showToast('Ошибка соединения с сервером: ' + error.message);
+            });
+        });
+        
+        // Проверяем, авторизован ли пользователь
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('wallet_stars_token');
+            
+            if (token) {
+                // Если токен есть, перенаправляем на главную
+                window.location.href = 'index.html';
+            }
+            
+            // Проверяем, запущен ли сервер
+            fetch('http://localhost:3000/api/health')
+                .then(response => response.json())
+                .then(data => {
+                    debugLog('Статус сервера', data);
+                    showToast('Сервер доступен');
+                })
+                .catch(error => {
+                    console.error('Сервер недоступен:', error);
+                    showToast('Ошибка: Сервер недоступен. Запустите node server.js');
+                });
+        });
+    </script>
+    
+    <style>
+        .login-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            justify-content: space-between;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: var(--spacing-xl);
+            padding-top: var(--spacing-xl);
+        }
+        
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .login-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+        
+        .login-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+        
+        .login-content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .login-description {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+            color: var(--text-secondary);
+        }
+        
+        .telegram-login-widget {
+            margin-bottom: var(--spacing-lg);
+            min-height: 50px;
+            border: 1px dashed #ccc;
+            padding: 10px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .telegram-login-widget::before {
+            content: 'Telegram Login Widget должен появиться здесь';
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .telegram-login-widget iframe {
+            border: none;
+        }
+        
+        .demo-login {
+            margin-top: var(--spacing-md);
+        }
+        
+        .demo-login-btn {
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: none;
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .demo-login-btn:hover {
+            background-color: var(--bg-tertiary);
+        }
+        
+        .login-features {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: var(--spacing-lg);
+        }
+        
+        .feature-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .feature-item .material-icons {
+            font-size: 24px;
+            color: var(--blue-primary);
+        }
+    </style>
+</body>
+</html> 

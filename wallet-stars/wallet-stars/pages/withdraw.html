@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Вывод средств | WalletStars</title>
+    <link rel="stylesheet" href="../styles/globals.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="../scripts/main.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Верхний блок с названием и кнопками -->
+        <header class="app-header">
+            <div class="header-actions">
+                <a href="index.html" class="icon-button">
+                    <span class="material-icons">arrow_back</span>
+                </a>
+                <div class="header-title">Вывод средств</div>
+                <div class="header-right-buttons">
+                    <button class="icon-button">
+                        <span class="material-icons">more_vert</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="withdraw-wrapper">
+            <!-- Выбор криптовалюты -->
+            <div class="currency-selector">
+                <button class="currency-btn ton-btn active" data-currency="TON">
+                    <div class="currency-icon ton-icon">
+                        <span class="material-icons">diamond</span>
+                    </div>
+                    <span>TON</span>
+                </button>
+                <button class="currency-btn usdt-btn" data-currency="USDT">
+                    <div class="currency-icon usdt-icon">
+                        <span class="material-icons">monetization_on</span>
+                    </div>
+                    <span>USDT</span>
+                </button>
+            </div>
+
+            <!-- Форма вывода средств -->
+            <form id="withdraw-form">
+                <!-- Адрес кошелька -->
+                <div class="form-group">
+                    <label class="form-label">Адрес кошелька (TON сеть)</label>
+                    <input type="text" id="wallet-address" placeholder="Адрес кошелька">
+                </div>
+
+                <!-- Сумма вывода -->
+                <div class="form-group">
+                    <div class="withdraw-amount-header">
+                        <label class="form-label">Сумма вывода</label>
+                        <span class="fee-label">Fee <span id="fee-amount">0.1 TON</span></span>
+                    </div>
+                    <div class="input-with-action">
+                        <input type="number" id="amount" placeholder="100" value="100">
+                        <button type="button" class="input-action" id="max-button">MAX</button>
+                    </div>
+                </div>
+
+                <!-- MEMO / Комментарий -->
+                <div class="form-group">
+                    <label class="form-label">MEMO / Комментарий</label>
+                    <input type="text" id="memo" placeholder="MEMO" value="WalletStars">
+                </div>
+
+                <!-- Сообщение об ошибке (скрыто по умолчанию) -->
+                <div class="error-message" id="error-message" style="display: none;">
+                    <div>
+                        <span class="material-icons error-icon">error</span>
+                        <span id="error-text">Минимальная сумма - 0.01</span>
+                    </div>
+                    <button type="button" class="close-button" id="close-error">Закрыть</button>
+                </div>
+
+                <!-- Кнопка отправки -->
+                <button type="submit" class="btn" id="submit-button">Отправить</button>
+            </form>
+        </div>
+
+        <!-- Нижнее меню -->
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <span class="material-icons">account_balance_wallet</span>
+                <span class="nav-label">Кошелёк</span>
+            </a>
+            <a href="market.html" class="nav-item">
+                <span class="material-icons">storefront</span>
+                <span class="nav-label">Маркет</span>
+            </a>
+            <a href="checks.html" class="nav-item">
+                <span class="material-icons">receipt</span>
+                <span class="nav-label">Чеки</span>
+            </a>
+            <a href="partnership.html" class="nav-item">
+                <span class="material-icons">people</span>
+                <span class="nav-label">Партнёрство</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons">card_giftcard</span>
+                <span class="nav-label">Розыгрыш</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Уведомление о копировании -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Проверка авторизации
+        function checkAuth() {
+            const userData = localStorage.getItem('wallet_stars_user');
+            
+            if (!userData) {
+                window.location.href = 'login.html';
+                return null;
+            }
+            
+            return JSON.parse(userData);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию
+            const userData = checkAuth();
+            if (!userData) return;
+            
+            // Получаем элементы формы
+            const currencyButtons = document.querySelectorAll('.currency-btn');
+            const feeAmountLabel = document.getElementById('fee-amount');
+            const withdrawForm = document.getElementById('withdraw-form');
+            const walletAddressInput = document.getElementById('wallet-address');
+            const amountInput = document.getElementById('amount');
+            const memoInput = document.getElementById('memo');
+            const maxButton = document.getElementById('max-button');
+            const errorMessage = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            const closeErrorButton = document.getElementById('close-error');
+            
+            // Установка начальных значений
+            let currentCurrency = 'TON';
+            let fees = {
+                'TON': 0.1,
+                'USDT': 1
+            };
+            
+            // Демо-данные баланса пользователя
+            const userBalances = {
+                'TON': 100,
+                'USDT': 200
+            };
+            
+            // Функция для обновления информации о комиссии
+            function updateFeeInfo() {
+                feeAmountLabel.textContent = `${fees[currentCurrency]} ${currentCurrency}`;
+            }
+            
+            // Обработчики для кнопок выбора валюты
+            currencyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Убираем активный класс у всех кнопок
+                    currencyButtons.forEach(b => b.classList.remove('active'));
+                    
+                    // Добавляем активный класс выбранной кнопке
+                    this.classList.add('active');
+                    
+                    // Обновляем текущую валюту
+                    currentCurrency = this.getAttribute('data-currency');
+                    
+                    // Обновляем информацию о комиссии
+                    updateFeeInfo();
+                });
+            });
+            
+            // Обработчик для кнопки MAX
+            maxButton.addEventListener('click', function() {
+                // Устанавливаем максимальную доступную сумму
+                amountInput.value = userBalances[currentCurrency];
+            });
+            
+            // Обработчик для закрытия сообщения об ошибке
+            closeErrorButton.addEventListener('click', function() {
+                errorMessage.style.display = 'none';
+            });
+            
+            // Обработчик отправки формы
+            withdrawForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Получаем значения полей
+                const address = walletAddressInput.value.trim();
+                const amount = parseFloat(amountInput.value);
+                const memo = memoInput.value.trim();
+                
+                // Валидация
+                if (!address) {
+                    showError('Введите адрес кошелька');
+                    return;
+                }
+                
+                if (!amount || isNaN(amount)) {
+                    showError('Введите корректную сумму');
+                    return;
+                }
+                
+                if (amount < 0.01) {
+                    showError('Минимальная сумма - 0.01');
+                    return;
+                }
+                
+                if (amount > userBalances[currentCurrency]) {
+                    showError('Недостаточно средств');
+                    return;
+                }
+                
+                // Заглушка успешной отправки
+                alert(`Транзакция на сумму ${amount} ${currentCurrency} отправлена на адрес ${address}`);
+                
+                // Перенаправление на главную страницу
+                window.location.href = 'index.html';
+            });
+            
+            // Функция для отображения ошибки
+            function showError(message) {
+                errorText.textContent = message;
+                errorMessage.style.display = 'flex';
+            }
+        });
+    </script>
+
+    <style>
+        /* Стили для страницы вывода средств */
+        .withdraw-wrapper {
+            padding: var(--spacing-md);
+        }
+        
+        .currency-selector {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .currency-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background-color: var(--bg-secondary);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .currency-btn.active {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .ton-btn.active .ton-icon {
+            background-color: var(--ton-color);
+        }
+        
+        .usdt-btn.active .usdt-icon {
+            background-color: var(--usdt-color);
+        }
+        
+        .currency-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius-circle);
+            background-color: var(--bg-tertiary);
+        }
+        
+        .withdraw-amount-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .fee-label {
+            font-size: 14px;
+            color: var(--blue-primary);
+        }
+        
+        .error-message {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(255, 82, 82, 0.1);
+            color: var(--error-color);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .error-message > div {
+            display: flex;
+            align-items: center;
+        }
+        
+        .error-icon {
+            margin-right: var(--spacing-sm);
+        }
+        
+        .close-button {
+            background: transparent;
+            border: none;
+            color: var(--blue-primary);
+            font-weight: 500;
+            cursor: pointer;
+        }
+    </style>
+</body>
+</html> 

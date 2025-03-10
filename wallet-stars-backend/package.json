@@ -1,0 +1,30 @@
+{
+  "name": "wallet-stars-backend",
+  "version": "1.0.0",
+  "description": "Backend API for WalletStars application",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "setup": "npm install && echo 'Установка завершена. Запустите приложение с помощью npm start'"
+  },
+  "keywords": [
+    "wallet",
+    "telegram",
+    "stars"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "nedb": "^1.8.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

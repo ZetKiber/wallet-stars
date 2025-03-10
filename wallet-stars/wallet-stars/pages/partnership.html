@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Партнёрство | WalletStars</title>
+    <link rel="stylesheet" href="../styles/globals.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="../scripts/main.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Верхний блок с названием и кнопками -->
+        <header class="app-header">
+            <div class="header-actions">
+                <a href="index.html" class="icon-button">
+                    <span class="material-icons">arrow_back</span>
+                </a>
+                <div class="header-title">Партнёрская программа</div>
+                <div class="header-right-buttons">
+                    <button class="icon-button">
+                        <span class="material-icons">more_vert</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Главный блок страницы -->
+        <div class="partnership-content">
+            <!-- Блок с партнерской ссылкой и процентом -->
+            <div class="partnership-header">
+                <div class="partnership-info">
+                    <div class="duck-icon">🦆</div>
+                    <div class="percentage-block">
+                        <div class="percentage">50%</div>
+                        <div class="percentage-label">Твой процент</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Блок с реферальной ссылкой -->
+            <div class="referral-link-container">
+                <input type="text" id="referral-link" class="referral-link-input" readonly 
+                    value="https://t.me/WalletStarsBot?startapp=1337067498">
+                <button class="copy-button" id="copy-link">
+                    <span class="material-icons">content_copy</span>
+                </button>
+            </div>
+
+            <!-- Блок статистики -->
+            <div class="stats-container">
+                <div class="stats-item">
+                    <div class="stats-value" id="invited-count">0</div>
+                    <div class="stats-label">Приглашено</div>
+                </div>
+                <div class="stats-item">
+                    <div class="stats-value" id="earnings">0.00 TON</div>
+                    <div class="stats-label">Заработок</div>
+                </div>
+            </div>
+
+            <!-- Кнопка "Пригласить" -->
+            <button class="action-button invite-button">
+                <span class="material-icons">share</span>
+                Пригласить
+            </button>
+        </div>
+
+        <!-- Нижнее меню -->
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <span class="material-icons">account_balance_wallet</span>
+                <span class="nav-label">Кошелёк</span>
+            </a>
+            <a href="market.html" class="nav-item">
+                <span class="material-icons">storefront</span>
+                <span class="nav-label">Маркет</span>
+            </a>
+            <a href="checks.html" class="nav-item">
+                <span class="material-icons">receipt</span>
+                <span class="nav-label">Чеки</span>
+            </a>
+            <a href="partnership.html" class="nav-item active">
+                <span class="material-icons">people</span>
+                <span class="nav-label">Партнёрство</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons">card_giftcard</span>
+                <span class="nav-label">Розыгрыш</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Уведомление о копировании -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Проверка авторизации
+        function checkAuth() {
+            const userData = localStorage.getItem('wallet_stars_user');
+            
+            if (!userData) {
+                window.location.href = 'login.html';
+                return null;
+            }
+            
+            return JSON.parse(userData);
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию
+            const userData = checkAuth();
+            if (!userData) return;
+            
+            // Инициализация статистики (заглушка)
+            const invitedCount = document.getElementById('invited-count');
+            const earnings = document.getElementById('earnings');
+            
+            // Демо-данные
+            invitedCount.textContent = '0';
+            earnings.textContent = '0.00 TON';
+            
+            // Обработчик для кнопки копирования ссылки
+            const copyLinkButton = document.getElementById('copy-link');
+            const referralLinkInput = document.getElementById('referral-link');
+            
+            if (copyLinkButton && referralLinkInput) {
+                copyLinkButton.addEventListener('click', function() {
+                    copyToClipboard(referralLinkInput.value);
+                });
+            }
+            
+            // Обработчик для кнопки "Пригласить"
+            const inviteButton = document.querySelector('.invite-button');
+            
+            if (inviteButton) {
+                inviteButton.addEventListener('click', function() {
+                    // В реальном приложении здесь должно быть открытие нативного диалога шаринга
+                    // Для демо просто показываем сообщение
+                    alert('В реальном приложении здесь откроется диалог для отправки приглашения');
+                });
+            }
+        });
+    </script>
+
+    <style>
+        /* Стили для страницы партнерства */
+        .partnership-content {
+            padding: var(--spacing-md);
+        }
+        
+        .partnership-header {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .partnership-info {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--blue-primary);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            color: white;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .duck-icon {
+            font-size: 60px;
+        }
+        
+        .percentage-block {
+            text-align: center;
+        }
+        
+        .percentage {
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1;
+        }
+        
+        .percentage-label {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+        
+        .referral-link-container {
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .referral-link-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding: var(--spacing-sm);
+        }
+        
+        .stats-container {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .stats-item {
+            flex: 1;
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            text-align: center;
+        }
+        
+        .stats-value {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .stats-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .action-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            width: 100%;
+            padding: var(--spacing-md);
+            background-color: var(--blue-primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .invite-button {
+            margin-top: var(--spacing-lg);
+        }
+    </style>
+</body>
+</html> 

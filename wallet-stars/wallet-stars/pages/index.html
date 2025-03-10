@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WalletStars | Кошелёк</title>
+    <link rel="stylesheet" href="../styles/globals.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="../scripts/main.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Верхний блок с названием и кнопками -->
+        <header class="app-header">
+            <div class="header-actions">
+                <button class="icon-button"><span class="material-icons">close</span></button>
+                <div class="header-title">WalletStars | Купить...</div>
+                <div class="header-right-buttons">
+                    <button class="icon-button"><span class="material-icons">expand_more</span></button>
+                    <button class="icon-button"><span class="material-icons">more_vert</span></button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Профиль пользователя -->
+        <div class="user-profile">
+            <div class="avatar-container">
+                <img src="#" alt="User Avatar" class="user-avatar" id="user-avatar">
+                <div class="user-id" id="user-id">#144257</div>
+            </div>
+            <div class="username" id="username">Артём</div>
+        </div>
+
+        <!-- Кнопки действий -->
+        <div class="action-buttons">
+            <a href="withdraw.html" class="withdraw-button">
+                <span class="material-icons">north_east</span> Вывести
+            </a>
+            <a href="deposit.html" class="deposit-button">
+                <span class="material-icons">south_west</span> Пополнить
+            </a>
+        </div>
+
+        <!-- Балансы криптовалют -->
+        <div class="balance-cards">
+            <div class="balance-card">
+                <div class="currency-info">
+                    <div class="currency-icon stars-icon">★</div>
+                    <div class="currency-name">STARS</div>
+                </div>
+                <div class="balance-info">
+                    <div class="balance-amount">0</div>
+                    <div class="balance-usd">0.00$</div>
+                </div>
+            </div>
+
+            <div class="balance-card">
+                <div class="currency-info">
+                    <div class="currency-icon ton-icon">
+                        <span class="material-icons">diamond</span>
+                    </div>
+                    <div class="currency-name">TON</div>
+                </div>
+                <div class="balance-info">
+                    <div class="balance-amount">0.00</div>
+                    <div class="balance-usd">0.00$</div>
+                </div>
+            </div>
+
+            <div class="balance-card">
+                <div class="currency-info">
+                    <div class="currency-icon usdt-icon">
+                        <span class="material-icons">monetization_on</span>
+                    </div>
+                    <div class="currency-name">USDT</div>
+                </div>
+                <div class="balance-info">
+                    <div class="balance-amount">0.00</div>
+                    <div class="balance-usd">0$</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- История транзакций -->
+        <div class="transaction-history">
+            <a href="transactions.html" class="history-link">
+                <span class="material-icons">history</span> История транзакций
+            </a>
+        </div>
+
+        <!-- Промо-блок -->
+        <div class="promo-block">
+            <div class="promo-content">
+                <div class="promo-icon">🎁</div>
+                <div class="promo-text">
+                    <div class="promo-title">Розыгрыш 1200$</div>
+                    <div class="promo-description">Выиграй Plush Pepe за 1200$!</div>
+                </div>
+            </div>
+            <a href="#" class="promo-button">View</a>
+        </div>
+
+        <!-- Нижнее меню -->
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-item active">
+                <span class="material-icons">account_balance_wallet</span>
+                <span class="nav-label">Кошелёк</span>
+            </a>
+            <a href="market.html" class="nav-item">
+                <span class="material-icons">storefront</span>
+                <span class="nav-label">Маркет</span>
+            </a>
+            <a href="checks.html" class="nav-item">
+                <span class="material-icons">receipt</span>
+                <span class="nav-label">Чеки</span>
+            </a>
+            <a href="partnership.html" class="nav-item">
+                <span class="material-icons">people</span>
+                <span class="nav-label">Партнёрство</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons">card_giftcard</span>
+                <span class="nav-label">Розыгрыш</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Уведомление о копировании -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию
+            const userData = checkAuth();
+            
+            // Если пользователь авторизован, обновляем интерфейс
+            if (userData) {
+                updateUserInterface(userData);
+            }
+        });
+    </script>
+</body>
+</html> 

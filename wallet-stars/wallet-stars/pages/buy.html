@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Купить звёзды | WalletStars</title>
+    <link rel="stylesheet" href="../styles/globals.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="../scripts/main.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Верхний блок с названием и кнопками -->
+        <header class="app-header">
+            <div class="header-actions">
+                <a href="market.html" class="icon-button">
+                    <span class="material-icons">arrow_back</span>
+                </a>
+                <div class="header-title">WalletStars | Купить...</div>
+                <div class="header-right-buttons">
+                    <button class="icon-button">
+                        <span class="material-icons">expand_more</span>
+                    </button>
+                    <button class="icon-button">
+                        <span class="material-icons">more_vert</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <div class="buy-content">
+            <!-- Иконка BUY -->
+            <div class="buy-icon-container">
+                <div class="buy-icon">
+                    <img src="../assets/images/buy-icon.svg" alt="Buy Stars" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 200\'><g><path fill=\'%2300E676\' d=\'M100,20 L130,80 L190,90 L145,135 L155,195 L100,165 L45,195 L55,135 L10,90 L70,80 Z\'/><text x=\'100\' y=\'120\' font-family=\'Arial\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\'>BUY</text></g></svg>'">
+                    <div class="user-profile-badge" id="user-profile-badge" style="display: none;">
+                        <span id="user-profile-name">Артём</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Форма покупки -->
+            <div class="buy-form">
+                <!-- Поле для получателя -->
+                <div class="recipient-input">
+                    <input type="text" id="recipient-username" placeholder="Введите @username получателя">
+                    <button class="recipient-self" id="recipient-self">Себе</button>
+                </div>
+
+                <!-- Отображение количества звезд и выбор валюты -->
+                <div class="stars-amount-selector">
+                    <div class="stars-display">
+                        <input type="number" id="stars-amount-display" placeholder="0" value="50" min="1">
+                        <div class="display-addon">
+                            <span class="star-icon">★</span>
+                            <span class="min-label" id="min-label">MIN</span>
+                        </div>
+                    </div>
+                    <div class="currency-selector">
+                        <button class="currency-btn ton-btn active" data-currency="TON">
+                            <div class="currency-icon ton-icon">
+                                <span class="material-icons">diamond</span>
+                            </div>
+                            <span>TON</span>
+                        </button>
+                        <button class="currency-btn rub-btn" data-currency="RUB">
+                            <div class="currency-icon rub-icon">
+                                <span class="currency-symbol">₽</span>
+                            </div>
+                            <span>RUB</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Выбор количества звёзд -->
+                <div class="stars-amount-options">
+                    <div class="stars-row">
+                        <button class="stars-option active" data-value="50">50<span class="star-icon">★</span></button>
+                        <button class="stars-option" data-value="100">100<span class="star-icon">★</span></button>
+                        <button class="stars-option" data-value="500">500<span class="star-icon">★</span></button>
+                        <button class="stars-option" data-value="1000">1000<span class="star-icon">★</span></button>
+                        <button class="stars-option max" data-value="max">MAX</button>
+                    </div>
+                </div>
+
+                <!-- Правила сервиса -->
+                <div class="service-rules">
+                    <p>Покупая «Telegram Stars», вы соглашаетесь с <a href="#" class="rules-link">правилами</a> сервиса.</p>
+                </div>
+
+                <!-- Кнопка покупки -->
+                <button class="buy-button" id="buy-stars-btn">Купить звёзды (~0.284 TON)</button>
+            </div>
+        </div>
+
+        <!-- Нижнее меню -->
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <span class="material-icons">account_balance_wallet</span>
+                <span class="nav-label">Кошелёк</span>
+            </a>
+            <a href="market.html" class="nav-item active">
+                <span class="material-icons">storefront</span>
+                <span class="nav-label">Маркет</span>
+            </a>
+            <a href="checks.html" class="nav-item">
+                <span class="material-icons">receipt</span>
+                <span class="nav-label">Чеки</span>
+            </a>
+            <a href="partnership.html" class="nav-item">
+                <span class="material-icons">people</span>
+                <span class="nav-label">Партнёрство</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons">card_giftcard</span>
+                <span class="nav-label">Розыгрыш</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Уведомление о копировании -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию
+            const userData = checkAuth();
+            if (!userData) return;
+            
+            // Получаем элементы формы
+            const recipientInput = document.getElementById('recipient-username');
+            const selfButton = document.getElementById('recipient-self');
+            const starsAmountInput = document.getElementById('stars-amount-display');
+            const minLabel = document.getElementById('min-label');
+            const starsOptions = document.querySelectorAll('.stars-option');
+            const currencyButtons = document.querySelectorAll('.currency-btn');
+            const buyButton = document.getElementById('buy-stars-btn');
+            const userProfileBadge = document.getElementById('user-profile-badge');
+            const userProfileName = document.getElementById('user-profile-name');
+            
+            // Константы для приложения
+            const MIN_STARS = 50;
+            
+            // Устанавливаем начальные значения
+            let selectedStars = MIN_STARS;
+            let selectedCurrency = 'TON';
+            
+            // Отображаем имя пользователя, если оно есть
+            if (userData.name) {
+                userProfileName.textContent = userData.name;
+                userProfileBadge.style.display = 'flex';
+            }
+            
+            // Обработчик фокуса для поля ввода - очищаем поле
+            starsAmountInput.addEventListener('focus', function() {
+                // Сохраняем текущее значение
+                const currentValue = this.value;
+                
+                // Если значение равно начальному или пустое, очищаем поле
+                if (currentValue == MIN_STARS || currentValue === '') {
+                    this.value = '';
+                    minLabel.style.display = 'none';
+                }
+            });
+            
+            // При потере фокуса, если поле пустое, возвращаем значение по умолчанию
+            starsAmountInput.addEventListener('blur', function() {
+                if (this.value === '') {
+                    this.value = MIN_STARS;
+                    updateMinLabel();
+                    updateBuyButtonPrice();
+                }
+            });
+            
+            // Функция для обновления метки MIN
+            function updateMinLabel() {
+                if (parseInt(starsAmountInput.value) === MIN_STARS) {
+                    minLabel.style.display = 'inline';
+                } else {
+                    minLabel.style.display = 'none';
+                }
+            }
+            
+            // Обработчик для кнопки "Себе"
+            if (selfButton) {
+                selfButton.addEventListener('click', function() {
+                    recipientInput.value = userData.username || '';
+                });
+            }
+            
+            // Обработчик для поля ввода количества звезд
+            if (starsAmountInput) {
+                starsAmountInput.addEventListener('input', function() {
+                    const value = parseInt(this.value) || 0;
+                    if (value <= 0) {
+                        selectedStars = 0;
+                    } else {
+                        selectedStars = value;
+                    }
+                    
+                    // Обновляем отображение метки MIN
+                    updateMinLabel();
+                    
+                    // Убираем выделение со всех кнопок и проверяем, совпадает ли значение с одной из кнопок
+                    starsOptions.forEach(btn => {
+                        btn.classList.remove('active');
+                        const btnValue = btn.getAttribute('data-value');
+                        if (btnValue !== 'max' && parseInt(btnValue) === selectedStars) {
+                            btn.classList.add('active');
+                        }
+                    });
+                    
+                    updateBuyButtonPrice();
+                });
+            }
+            
+            // Обработчики для кнопок выбора количества звезд
+            starsOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Удаляем выделение у всех кнопок
+                    starsOptions.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Добавляем выделение текущей кнопке
+                    this.classList.add('active');
+                    
+                    // Сохраняем выбранное количество
+                    const value = this.getAttribute('data-value');
+                    
+                    if (value === 'max') {
+                        // Здесь можно было бы получить максимальное количество звезд от API
+                        // Пока используем фиксированное значение
+                        selectedStars = 10000;
+                        starsAmountInput.value = selectedStars;
+                    } else {
+                        selectedStars = parseInt(value);
+                        starsAmountInput.value = value;
+                    }
+                    
+                    // Обновляем отображение метки MIN
+                    updateMinLabel();
+                    
+                    updateBuyButtonPrice();
+                });
+            });
+            
+            // Обработчики для кнопок выбора валюты
+            currencyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Удаляем активный класс у всех кнопок
+                    currencyButtons.forEach(b => b.classList.remove('active'));
+                    
+                    // Добавляем активный класс выбранной кнопке
+                    this.classList.add('active');
+                    
+                    // Обновляем текущую валюту
+                    selectedCurrency = this.getAttribute('data-currency');
+                    
+                    // Обновляем цену в кнопке
+                    updateBuyButtonPrice();
+                });
+            });
+            
+            // Функция для форматирования чисел с разделителями групп разрядов
+            function formatLargeNumber(number) {
+                return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
+            
+            // Функция для обновления цены в кнопке
+            function updateBuyButtonPrice() {
+                let price;
+                
+                if (selectedCurrency === 'TON') {
+                    // Приблизительная стоимость в TON (0.00568 TON за 1 звезду)
+                    price = selectedStars * 0.00568;
+                    buyButton.textContent = `Купить звёзды (~${formatLargeNumber(price.toFixed(3))} TON)`;
+                } else {
+                    // Приблизительная стоимость в RUB (3.75 RUB за 1 звезду)
+                    price = selectedStars * 3.75;
+                    buyButton.textContent = `Купить звёзды (~${formatLargeNumber(price.toFixed(0))} ₽)`;
+                }
+            }
+            
+            // Инициализируем цену в кнопке и метку MIN
+            updateBuyButtonPrice();
+            updateMinLabel();
+            
+            // Обработчик для кнопки покупки
+            if (buyButton) {
+                buyButton.addEventListener('click', function() {
+                    const recipient = recipientInput.value.trim();
+                    
+                    if (!recipient) {
+                        showToast('Введите имя получателя');
+                        return;
+                    }
+                    
+                    if (selectedStars <= 0) {
+                        showToast('Укажите количество звезд');
+                        return;
+                    }
+                    
+                    // Здесь будет код для показа подтверждения покупки
+                    // В реальном приложении здесь должен быть запрос к серверу
+                    showToast(`Запрос на покупку ${selectedStars} звезд для ${recipient} отправлен`);
+                });
+            }
+        });
+    </script>
+
+    <style>
+        /* Стили для страницы покупки */
+        .buy-content {
+            padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .buy-icon-container {
+            margin: var(--spacing-md) 0;
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-xl);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .buy-icon {
+            width: 180px;
+            height: 180px;
+            position: relative;
+        }
+        
+        .buy-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .user-profile-badge {
+            position: absolute;
+            left: 20px;
+            bottom: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #00E676;
+            border-radius: var(--border-radius-md);
+            padding: 4px 12px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .buy-form {
+            width: 100%;
+            margin-top: var(--spacing-md);
+        }
+        
+        .recipient-input {
+            display: flex;
+            margin-bottom: var(--spacing-md);
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-xs);
+        }
+        
+        .recipient-input input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+        
+        /* Убираем подсветку при фокусе */
+        .recipient-input input:focus {
+            outline: none;
+        }
+        
+        .recipient-self {
+            background-color: var(--blue-primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .stars-amount-selector {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .stars-display {
+            background-color: #1F1F1F; /* Темный фон как на скриншоте */
+            padding: 8px 12px;
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            height: 40px; /* Уменьшаем высоту */
+        }
+        
+        .stars-display input {
+            width: 40px;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 16px;
+            text-align: right;
+            padding-right: 2px;
+            -moz-appearance: textfield;
+        }
+        
+        .stars-display input:focus {
+            outline: none;
+        }
+        
+        .stars-display input::-webkit-outer-spin-button,
+        .stars-display input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .display-addon {
+            display: flex;
+            align-items: center;
+        }
+        
+        .star-icon {
+            color: var(--stars-color);
+            margin: 0 1px;
+        }
+        
+        .min-label {
+            margin-left: 2px;
+            font-size: 14px;
+        }
+        
+        .currency-selector {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .currency-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px 10px;
+            background-color: var(--bg-secondary);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            height: 40px; /* Уменьшаем высоту */
+        }
+        
+        .currency-btn.active {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .currency-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius-circle);
+        }
+        
+        .ton-icon {
+            color: var(--ton-color);
+        }
+        
+        .ton-icon .material-icons {
+            font-size: 18px;
+        }
+        
+        .rub-icon {
+            background-color: #2A9D8F;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .currency-symbol {
+            font-size: 14px;
+        }
+        
+        .stars-amount-options {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .stars-row {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .stars-option {
+            flex: 1;
+            background-color: var(--bg-tertiary);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-sm);
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 36px; /* Уменьшаем высоту */
+        }
+        
+        .stars-option.active {
+            background-color: var(--blue-primary);
+            color: white;
+        }
+        
+        .stars-option.active .star-icon {
+            color: white;
+        }
+        
+        .stars-option.max {
+            background-color: var(--blue-primary);
+            color: white;
+        }
+        
+        .service-rules {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .rules-link {
+            color: var(--blue-primary);
+            text-decoration: none;
+        }
+        
+        .buy-button {
+            width: 100%;
+            padding: var(--spacing-md);
+            background-color: var(--blue-primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+    </style>
+</body>
+</html> 

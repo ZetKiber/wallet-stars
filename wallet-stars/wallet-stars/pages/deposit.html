@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Пополнение | WalletStars</title>
+    <link rel="stylesheet" href="../styles/globals.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="../scripts/main.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Верхний блок с названием и кнопками -->
+        <header class="app-header">
+            <div class="header-actions">
+                <a href="index.html" class="icon-button">
+                    <span class="material-icons">arrow_back</span>
+                </a>
+                <div class="header-title">Пополнение кошелька</div>
+                <div class="header-right-buttons">
+                    <button class="icon-button">
+                        <span class="material-icons">more_vert</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="deposit-wrapper">
+            <!-- Инструкция -->
+            <div class="deposit-instruction">
+                <p>Отправляйте на этот адрес только 
+                    <span class="highlight">TON</span> или 
+                    <span class="highlight">USDT(TON)</span> с использованием 
+                    <span class="highlight">MEMO</span>, иначе вы можете потерять свои средства.
+                </p>
+            </div>
+
+            <!-- QR-код -->
+            <div class="qr-container">
+                <div class="qr-code" id="qrcode">
+                    <!-- QR-код будет сгенерирован JavaScript'ом -->
+                </div>
+            </div>
+
+            <!-- Адрес кошелька -->
+            <div class="form-group">
+                <div class="form-label">Адрес кошелька</div>
+                <div class="address-container">
+                    <input type="text" id="wallet-address" class="address-input" readonly 
+                        value="UQDzo7q9vJX4C65faF6QVhdDL2BY2Rq54GbKpTKW5vJZsHL">
+                    <button class="copy-button" id="copy-address">
+                        <span class="material-icons">content_copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tag/Memo -->
+            <div class="form-group">
+                <div class="form-label">
+                    Tag/Memo (Comment/Remark) 
+                    <span class="required-label">обязательно</span>
+                </div>
+                <div class="address-container">
+                    <input type="text" id="memo-field" class="address-input" readonly value="144257">
+                    <button class="copy-button" id="copy-memo">
+                        <span class="material-icons">content_copy</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижнее меню -->
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <span class="material-icons">account_balance_wallet</span>
+                <span class="nav-label">Кошелёк</span>
+            </a>
+            <a href="market.html" class="nav-item">
+                <span class="material-icons">storefront</span>
+                <span class="nav-label">Маркет</span>
+            </a>
+            <a href="checks.html" class="nav-item">
+                <span class="material-icons">receipt</span>
+                <span class="nav-label">Чеки</span>
+            </a>
+            <a href="partnership.html" class="nav-item">
+                <span class="material-icons">people</span>
+                <span class="nav-label">Партнёрство</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons">card_giftcard</span>
+                <span class="nav-label">Розыгрыш</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Уведомление о копировании -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Проверка авторизации
+        function checkAuth() {
+            const userData = localStorage.getItem('wallet_stars_user');
+            
+            if (!userData) {
+                window.location.href = 'login.html';
+                return null;
+            }
+            
+            return JSON.parse(userData);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию
+            const userData = checkAuth();
+            
+            if (!userData) return;
+            
+            // Генерируем QR-код
+            generateQRCode();
+            
+            // Настраиваем кнопки копирования
+            const copyAddressButton = document.getElementById('copy-address');
+            const copyMemoButton = document.getElementById('copy-memo');
+            const walletAddressInput = document.getElementById('wallet-address');
+            const memoField = document.getElementById('memo-field');
+            
+            // Обработчик для кнопки копирования адреса
+            if (copyAddressButton && walletAddressInput) {
+                copyAddressButton.addEventListener('click', function() {
+                    copyToClipboard(walletAddressInput.value);
+                });
+            }
+            
+            // Обработчик для кнопки копирования MEMO
+            if (copyMemoButton && memoField) {
+                copyMemoButton.addEventListener('click', function() {
+                    copyToClipboard(memoField.value);
+                });
+            }
+        });
+        
+        // Генерация QR-кода (заглушка)
+        function generateQRCode() {
+            // В реальном проекте здесь должна быть библиотека для генерации QR-кода
+            // Например, QRCode.js или другая
+            
+            // Для демонстрации используем изображение QR-кода
+            const qrCodeElement = document.getElementById('qrcode');
+            qrCodeElement.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=UQDzo7q9vJX4C65faF6QVhdDL2BY2Rq54GbKpTKW5vJZsHL-MEMO:144257" alt="QR Code">`;
+        }
+    </script>
+
+    <style>
+        /* Стили для страницы пополнения */
+        .deposit-wrapper {
+            padding: var(--spacing-md);
+        }
+        
+        .deposit-instruction {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xl);
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            color: var(--blue-primary);
+            font-weight: 500;
+        }
+        
+        .qr-code img {
+            width: 100%;
+            max-width: 200px;
+            height: auto;
+        }
+    </style>
+</body>
+</html> 

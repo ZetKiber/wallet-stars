@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stars Чеки | WalletStars</title>
+    <link rel="stylesheet" href="../styles/globals.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="../scripts/main.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Верхний блок с названием и кнопками -->
+        <header class="app-header">
+            <div class="header-actions">
+                <a href="index.html" class="icon-button">
+                    <span class="material-icons">arrow_back</span>
+                </a>
+                <div class="header-title">Stars Чеки</div>
+                <div class="header-right-buttons">
+                    <button class="icon-button">
+                        <span class="material-icons">more_vert</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Главный блок страницы -->
+        <div class="checks-content">
+            <h1 class="checks-title">Stars Чеки</h1>
+            <p class="checks-description">
+                Чеки - уникальная функция нашего кошелька, с помощью которой вы можете делиться звёздами с другими пользователями
+            </p>
+
+            <!-- Форма создания чека -->
+            <div class="check-form">
+                <!-- Выбор количества чеков -->
+                <div class="input-row">
+                    <div class="dropdown">
+                        <button class="dropdown-button">
+                            <span id="check-count">1 акт.</span>
+                            <span class="material-icons">expand_more</span>
+                        </button>
+                        <!-- Выпадающий список будет реализован через JavaScript -->
+                    </div>
+                    <div class="star-range">
+                        <span>По 1 - 100,000</span>
+                        <span class="star-icon">★</span>
+                    </div>
+                </div>
+
+                <!-- Пароль (опционально) -->
+                <div class="password-input">
+                    <input type="text" id="check-password" placeholder="Если без пароля - оставь пустым">
+                </div>
+
+                <!-- Кнопка создания -->
+                <button id="create-check" class="btn">Создать чек</button>
+            </div>
+
+            <!-- История чеков -->
+            <div class="checks-history">
+                <a href="#" class="history-link">
+                    <span class="material-icons">history</span> История чеков
+                </a>
+            </div>
+
+            <!-- Сообщение об ошибке (скрыто по умолчанию) -->
+            <div class="error-message" id="error-message" style="display: none;">
+                <div>
+                    <span class="material-icons error-icon">error</span>
+                    <span id="error-text">Минимальная награда за один чек - 1 ★</span>
+                </div>
+                <button type="button" class="close-button" id="close-error">Закрыть</button>
+            </div>
+        </div>
+
+        <!-- Нижнее меню -->
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <span class="material-icons">account_balance_wallet</span>
+                <span class="nav-label">Кошелёк</span>
+            </a>
+            <a href="market.html" class="nav-item">
+                <span class="material-icons">storefront</span>
+                <span class="nav-label">Маркет</span>
+            </a>
+            <a href="checks.html" class="nav-item active">
+                <span class="material-icons">receipt</span>
+                <span class="nav-label">Чеки</span>
+            </a>
+            <a href="partnership.html" class="nav-item">
+                <span class="material-icons">people</span>
+                <span class="nav-label">Партнёрство</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons">card_giftcard</span>
+                <span class="nav-label">Розыгрыш</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Модальное окно для выбора количества чеков -->
+    <div class="modal" id="checks-count-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Выберите количество чеков</h3>
+                <button class="close-modal">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="count-options">
+                    <button class="count-option" data-count="1">1</button>
+                    <button class="count-option" data-count="2">2</button>
+                    <button class="count-option" data-count="3">3</button>
+                    <button class="count-option" data-count="5">5</button>
+                    <button class="count-option" data-count="10">10</button>
+                    <button class="count-option" data-count="15">15</button>
+                    <button class="count-option" data-count="20">20</button>
+                    <button class="count-option" data-count="30">30</button>
+                    <button class="count-option" data-count="50">50</button>
+                    <button class="count-option" data-count="100">100</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомление о копировании -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию
+            const userData = checkAuth();
+            if (!userData) return;
+            
+            // Элементы интерфейса
+            const checkCountButton = document.querySelector('.dropdown-button');
+            const modal = document.getElementById('checks-count-modal');
+            const closeModalButton = document.querySelector('.close-modal');
+            const countOptions = document.querySelectorAll('.count-option');
+            const checkCountText = document.getElementById('check-count');
+            const createCheckButton = document.getElementById('create-check');
+            const errorMessage = document.getElementById('error-message');
+            const closeErrorButton = document.getElementById('close-error');
+            
+            // Обработчик для кнопки выбора количества чеков
+            checkCountButton.addEventListener('click', function() {
+                modal.style.display = 'flex';
+            });
+            
+            // Обработчик для закрытия модального окна
+            closeModalButton.addEventListener('click', function() {
+                modal.style.display = 'none';
+            });
+            
+            // Закрытие модального окна при клике вне его
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            
+            // Обработчики для опций количества
+            countOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const count = this.getAttribute('data-count');
+                    checkCountText.textContent = `${count} акт.`;
+                    modal.style.display = 'none';
+                });
+            });
+            
+            // Обработчик для кнопки создания чека
+            createCheckButton.addEventListener('click', function() {
+                // Заглушка для демонстрации ошибки
+                errorMessage.style.display = 'flex';
+            });
+            
+            // Обработчик для закрытия сообщения об ошибке
+            closeErrorButton.addEventListener('click', function() {
+                errorMessage.style.display = 'none';
+            });
+            
+            // Обработчик для ссылки на историю чеков
+            const historyLink = document.querySelector('.history-link');
+            historyLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('История чеков будет доступна в ближайшее время');
+            });
+        });
+    </script>
+
+    <style>
+        /* Стили для страницы чеков */
+        .checks-content {
+            padding: var(--spacing-md);
+        }
+        
+        .checks-title {
+            font-size: 24px;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .checks-description {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: var(--spacing-lg);
+            line-height: 1.6;
+        }
+        
+        .check-form {
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .input-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .dropdown {
+            position: relative;
+        }
+        
+        .dropdown-button {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            background-color: var(--bg-tertiary);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            color: var(--text-primary);
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .star-range {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .star-icon {
+            color: var(--stars-color);
+        }
+        
+        .password-input {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .password-input input {
+            width: 100%;
+            padding: var(--spacing-md);
+            background-color: var(--bg-tertiary);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+        
+        .checks-history {
+            text-align: center;
+            margin-top: var(--spacing-md);
+        }
+        
+        .history-link {
+            color: var(--blue-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-xs);
+            font-size: 14px;
+        }
+        
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius-md);
+            width: 90%;
+            max-width: 400px;
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            padding: var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bg-tertiary);
+        }
+        
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .close-modal {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: var(--spacing-md);
+        }
+        
+        .count-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: var(--spacing-sm);
+        }
+        
+        .count-option {
+            padding: var(--spacing-md);
+            background-color: var(--bg-tertiary);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .count-option:hover {
+            background-color: var(--blue-primary);
+        }
+        
+        /* Сообщение об ошибке */
+        .error-message {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(255, 82, 82, 0.1);
+            color: var(--error-color);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+            margin-top: var(--spacing-md);
+        }
+        
+        .error-message > div {
+            display: flex;
+            align-items: center;
+        }
+        
+        .error-icon {
+            margin-right: var(--spacing-sm);
+        }
+        
+        .close-button {
+            background: transparent;
+            border: none;
+            color: var(--blue-primary);
+            font-weight: 500;
+            cursor: pointer;
+        }
+    </style>
+</body>
+</html> 

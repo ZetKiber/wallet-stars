@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Продать звёзды | WalletStars</title>
+    <link rel="stylesheet" href="../styles/globals.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="../scripts/main.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Верхний блок с названием и кнопками -->
+        <header class="app-header">
+            <div class="header-actions">
+                <a href="market.html" class="icon-button">
+                    <span class="material-icons">arrow_back</span>
+                </a>
+                <div class="header-title">WalletStars | Купить...</div>
+                <div class="header-right-buttons">
+                    <button class="icon-button">
+                        <span class="material-icons">expand_more</span>
+                    </button>
+                    <button class="icon-button">
+                        <span class="material-icons">more_vert</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <div class="sell-content">
+            <!-- Иконка SELL -->
+            <div class="sell-icon-container">
+                <div class="sell-icon">
+                    <img src="../assets/images/sell-icon.svg" alt="Sell Stars" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 200 200\'><g><path fill=\'%23FF6A7A\' d=\'M100,20 L130,80 L190,90 L145,135 L155,195 L100,165 L45,195 L55,135 L10,90 L70,80 Z\'/><text x=\'100\' y=\'120\' font-family=\'Arial\' font-size=\'40\' text-anchor=\'middle\' fill=\'white\'>SELL</text></g></svg>'">
+                </div>
+            </div>
+
+            <!-- Форма продажи -->
+            <div class="sell-form">
+                <div class="sell-form-labels">
+                    <div class="sell-label">Количество звёзд</div>
+                    <div class="sell-label">Вы получите:</div>
+                </div>
+
+                <div class="sell-form-row">
+                    <!-- Количество звёзд -->
+                    <div class="sell-form-group stars-amount-group">
+                        <div class="sell-input-container">
+                            <input type="number" id="stars-amount" class="sell-input" placeholder="0" value="50">
+                        </div>
+                    </div>
+
+                    <!-- Вы получите -->
+                    <div class="sell-form-group receive-group">
+                        <div class="sell-input-container receive-container">
+                            <div class="receive-amount">
+                                <span id="receive-amount">0.45</span>
+                                <span class="currency-icon ton-receive-icon">
+                                    <span class="material-icons">diamond</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Правила сервиса -->
+                <div class="service-rules">
+                    <p>Продавая «Telegram Stars», вы соглашаетесь с <a href="#" class="rules-link">правилами</a> сервиса.</p>
+                </div>
+
+                <!-- Кнопка продажи -->
+                <button class="sell-button" id="sell-stars-btn">Продать звёзды</button>
+            </div>
+
+            <!-- Модальное окно подтверждения (скрыто по умолчанию) -->
+            <div class="confirmation-modal" id="confirmation-modal" style="display: none;">
+                <div class="confirmation-overlay"></div>
+                <div class="confirmation-content">
+                    <!-- Анимация звезд на фоне -->
+                    <div class="star-animation">
+                        <div class="star-bg star-bg-1">★</div>
+                        <div class="star-bg star-bg-2">★</div>
+                        <div class="star-bg star-bg-3">★</div>
+                        <div class="star-bg star-bg-4">★</div>
+                        <div class="star-bg star-bg-5">+</div>
+                        <div class="star-bg star-bg-6">+</div>
+                    </div>
+                    
+                    <!-- Центральная иконка -->
+                    <div class="stars-badge-container">
+                        <div class="stars-badge large">
+                            <img src="../assets/images/stars-icon.svg" alt="Stars" class="stars-icon" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><circle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%230088CC\'/><path d=\'M50,25 L60,40 L75,45 L65,60 L65,75 L50,65 L35,75 L35,60 L25,45 L40,40 Z\' fill=\'white\'/></svg>'">
+                        </div>
+                        <div class="stars-balance-label">Баланс</div>
+                        <div class="stars-balance-value">★ <span id="confirmation-balance">0</span></div>
+                    </div>
+                    
+                    <!-- Текст подтверждения -->
+                    <div class="confirmation-title">Подтверждение покупки</div>
+                    <div class="confirmation-message" id="confirmation-message">
+                        Вы точно хотите приобрести 0.45 USDT в WalletStars | Купить Звёзды за 50 звёзд?
+                    </div>
+                    
+                    <!-- Кнопка подтверждения -->
+                    <button class="confirmation-button" id="confirm-button">
+                        Подтвердить и заплатить <span class="star-icon">★</span> <span id="confirm-amount">50</span> звёзд
+                    </button>
+                    
+                    <!-- Условия использования -->
+                    <div class="confirmation-terms">
+                        Совершая покупку, Вы принимаете <a href="#" class="terms-link">условия</a> Telegram.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Нижнее меню -->
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <span class="material-icons">account_balance_wallet</span>
+                <span class="nav-label">Кошелёк</span>
+            </a>
+            <a href="market.html" class="nav-item active">
+                <span class="material-icons">storefront</span>
+                <span class="nav-label">Маркет</span>
+            </a>
+            <a href="checks.html" class="nav-item">
+                <span class="material-icons">receipt</span>
+                <span class="nav-label">Чеки</span>
+            </a>
+            <a href="partnership.html" class="nav-item">
+                <span class="material-icons">people</span>
+                <span class="nav-label">Партнёрство</span>
+            </a>
+            <a href="#" class="nav-item">
+                <span class="material-icons">card_giftcard</span>
+                <span class="nav-label">Розыгрыш</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Уведомление о копировании -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверяем авторизацию
+            const userData = checkAuth();
+            if (!userData) return;
+            
+            // Получаем элементы формы
+            const starsAmountInput = document.getElementById('stars-amount');
+            const receiveAmountSpan = document.getElementById('receive-amount');
+            const confirmationBalance = document.getElementById('confirmation-balance');
+            const sellButton = document.getElementById('sell-stars-btn');
+            const confirmationModal = document.getElementById('confirmation-modal');
+            const confirmationMessage = document.getElementById('confirmation-message');
+            const confirmButton = document.getElementById('confirm-button');
+            const confirmAmount = document.getElementById('confirm-amount');
+            
+            // Сохраняем начальное значение
+            const defaultStarsAmount = 50;
+            
+            // Устанавливаем баланс звезд в модальном окне
+            if (userData.balances && userData.balances.STARS) {
+                confirmationBalance.textContent = formatNumber(userData.balances.STARS, 0);
+            }
+            
+            // Обработчик фокуса для поля ввода - очищаем поле
+            starsAmountInput.addEventListener('focus', function() {
+                // Сохраняем текущее значение
+                const currentValue = this.value;
+                
+                // Если значение равно начальному или пустое, очищаем поле
+                if (currentValue == defaultStarsAmount || currentValue === '') {
+                    this.value = '';
+                }
+            });
+            
+            // При потере фокуса, если поле пустое, возвращаем значение по умолчанию
+            starsAmountInput.addEventListener('blur', function() {
+                if (this.value === '') {
+                    this.value = defaultStarsAmount;
+                    updateReceiveAmount();
+                }
+            });
+            
+            // Расчет получаемой суммы при изменении количества звезд
+            if (starsAmountInput) {
+                starsAmountInput.addEventListener('input', function() {
+                    updateReceiveAmount();
+                });
+                
+                // Инициализация поля
+                updateReceiveAmount();
+            }
+            
+            // Функция для форматирования чисел с разделителями групп разрядов
+            function formatLargeNumber(number) {
+                return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
+            
+            // Функция для расчета получаемой суммы
+            function updateReceiveAmount() {
+                const starsAmount = parseInt(starsAmountInput.value) || 0;
+                
+                // Расчет по курсу (примерно)
+                const rate = 0.009; // 0.009 TON за 1 звезду
+                const receiveAmount = starsAmount * rate;
+                
+                // Обновляем отображение с форматированием
+                receiveAmountSpan.textContent = formatLargeNumber(receiveAmount.toFixed(3));
+                
+                // Обновляем текст в модальном окне
+                if (confirmationMessage) {
+                    confirmationMessage.textContent = `Вы точно хотите приобрести ${formatLargeNumber(receiveAmount.toFixed(3))} USDT в WalletStars | Купить Звёзды за ${formatLargeNumber(starsAmount)} звёзд?`;
+                }
+                
+                // Обновляем количество в кнопке подтверждения
+                if (confirmAmount) {
+                    confirmAmount.textContent = formatLargeNumber(starsAmount);
+                }
+            }
+            
+            // Обработчик для кнопки продажи
+            if (sellButton) {
+                sellButton.addEventListener('click', function() {
+                    const starsAmount = parseInt(starsAmountInput.value) || 0;
+                    
+                    if (starsAmount <= 0) {
+                        showToast('Введите количество звезд');
+                        return;
+                    }
+                    
+                    if (userData.balances && userData.balances.STARS && starsAmount > userData.balances.STARS) {
+                        showToast('Недостаточно звезд');
+                        return;
+                    }
+                    
+                    // Показываем модальное окно подтверждения
+                    if (confirmationModal) {
+                        confirmationModal.style.display = 'flex';
+                    }
+                });
+            }
+            
+            // Обработчик для кнопки подтверждения
+            if (confirmButton) {
+                confirmButton.addEventListener('click', function() {
+                    // Здесь будет код для отправки запроса на сервер
+                    
+                    // Скрываем модальное окно
+                    confirmationModal.style.display = 'none';
+                    
+                    // Показываем сообщение об успешной продаже
+                    showToast('Звезды успешно проданы');
+                    
+                    // Обновляем баланс (в реальном приложении здесь должен быть запрос к серверу)
+                    const starsAmount = parseInt(starsAmountInput.value) || 0;
+                    
+                    if (userData.balances && userData.balances.STARS) {
+                        const newBalance = userData.balances.STARS - starsAmount;
+                        userData.balances.STARS = newBalance;
+                        localStorage.setItem('wallet_stars_user', JSON.stringify(userData));
+                        confirmationBalance.textContent = formatLargeNumber(newBalance);
+                    }
+                });
+            }
+            
+            // Закрытие модального окна при клике вне его содержимого
+            window.addEventListener('click', function(event) {
+                if (event.target.classList.contains('confirmation-overlay')) {
+                    confirmationModal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+    <style>
+        /* Стили для страницы продажи */
+        .sell-content {
+            padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .sell-icon-container {
+            margin: var(--spacing-md) 0;
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-xl);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .sell-icon {
+            width: 180px;
+            height: 180px;
+        }
+        
+        .sell-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .sell-form {
+            width: 100%;
+            margin-top: var(--spacing-md);
+        }
+        
+        .sell-form-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 0 2px;
+        }
+        
+        .sell-form-row {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            align-items: stretch; /* Выравниваем элементы по высоте */
+        }
+        
+        .sell-form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stars-amount-group {
+            flex: 1; /* Оба блока имеют одинаковый размер */
+        }
+
+        .receive-group {
+            flex: 1;
+        }
+        
+        .sell-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .sell-input-container {
+            background-color: #1F1F1F; /* Темный фон как на скриншоте */
+            border-radius: var(--border-radius-sm);
+            padding: 10px;
+            height: 44px; /* Уменьшаем высоту */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .sell-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 16px; /* Уменьшаем размер шрифта */
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        /* Убираем стрелки с поля ввода числа */
+        .sell-input::-webkit-outer-spin-button,
+        .sell-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        /* Firefox */
+        .sell-input[type=number] {
+            -moz-appearance: textfield;
+        }
+        
+        /* Убираем подсветку при фокусе */
+        .sell-input:focus {
+            outline: none;
+        }
+        
+        .receive-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .receive-amount {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-primary);
+            font-size: 16px; /* Уменьшаем размер шрифта */
+            font-weight: 500;
+        }
+        
+        .ton-receive-icon {
+            color: var(--ton-color);
+            width: 18px; /* Немного уменьшаем иконку */
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .ton-receive-icon .material-icons {
+            font-size: 18px; /* Уменьшаем размер иконки */
+        }
+        
+        .service-rules {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .rules-link {
+            color: var(--blue-primary);
+            text-decoration: none;
+        }
+        
+        .sell-button {
+            width: 100%;
+            padding: var(--spacing-md);
+            background-color: var(--blue-primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        /* Стили для модального окна подтверждения */
+        .confirmation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .confirmation-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        
+        .confirmation-content {
+            position: relative;
+            background-color: var(--bg-primary);
+            width: 90%;
+            max-width: 350px;
+            padding: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            z-index: 1001;
+            overflow: hidden;
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Анимация звезд на фоне */
+        .star-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .star-bg {
+            position: absolute;
+            color: var(--stars-color);
+            opacity: 0.3;
+            font-size: 20px;
+        }
+        
+        .star-bg-1 {
+            top: 20%;
+            left: 10%;
+            animation: float 3s infinite ease-in-out;
+        }
+        
+        .star-bg-2 {
+            top: 30%;
+            right: 15%;
+            animation: float 2.5s infinite ease-in-out;
+        }
+        
+        .star-bg-3 {
+            bottom: 25%;
+            left: 20%;
+            animation: float 4s infinite ease-in-out;
+        }
+        
+        .star-bg-4 {
+            bottom: 30%;
+            right: 20%;
+            animation: float 3.5s infinite ease-in-out;
+        }
+        
+        .star-bg-5 {
+            top: 50%;
+            left: 30%;
+            animation: float 2.8s infinite ease-in-out;
+        }
+        
+        .star-bg-6 {
+            top: 40%;
+            right: 30%;
+            animation: float 3.2s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .stars-badge-container {
+            margin-top: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stars-badge {
+            width: 50px;
+            height: 50px;
+            background-color: var(--blue-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .stars-icon {
+            width: 80%;
+            height: 80%;
+        }
+        
+        .stars-balance-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+        
+        .stars-balance-value {
+            color: var(--stars-color);
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .confirmation-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+        
+        .confirmation-message {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 0 var(--spacing-sm);
+        }
+        
+        .confirmation-button {
+            width: 100%;
+            padding: var(--spacing-sm);
+            background-color: var(--blue-primary);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .confirmation-terms {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        
+        .terms-link {
+            color: var(--blue-primary);
+            text-decoration: none;
+        }
+    </style>
+</body>
+</html> 

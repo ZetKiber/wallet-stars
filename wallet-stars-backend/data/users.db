@@ -1,0 +1,2 @@
+{"$$indexCreated":{"fieldName":"telegramId","unique":true,"sparse":false}}
+{"$$indexCreated":{"fieldName":"username","unique":false,"sparse":false}}
