@@ -94,4 +94,9 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('Доступные тестовые маршруты:');
   console.log('- http://localhost:' + PORT + '/api/health');
   console.log('- http://localhost:' + PORT + '/api/test');
-}); 
+});
+
+if (!process.env.JWT_SECRET) {
+  console.error('Отсутствует JWT_SECRET в переменных окружения');
+  process.exit(1);
+} 
